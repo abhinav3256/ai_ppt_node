@@ -1587,7 +1587,7 @@ async function fetchSlides(topic = "JavaScript", lang = "English") {
     const no_of_slide = urlParams.get("no_of_slides");
         const lang = "English"; // Default or modify as needed
 
-        const response = await fetch(`http://localhost/game_api/game_api/generate_slide.php?topic=${encodeURIComponent(topic)}&lang=${encodeURIComponent(lang)}&no_of_slide=${encodeURIComponent(no_of_slide)}`);
+        const response = await fetch(`https://aipresentationsmakers.com/ai_slides/generate_slide.php?topic=${encodeURIComponent(topic)}&lang=${encodeURIComponent(lang)}&no_of_slide=${encodeURIComponent(no_of_slide)}`);
        // const response = await fetch(`https://aipresentationsmakers.com/ai_slides/generate_slide.php?topic=${encodeURIComponent(topic)}&lang=${encodeURIComponent(lang)}`);
         const data = await response.json();
         
