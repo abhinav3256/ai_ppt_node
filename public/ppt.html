@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentation Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #2F80ED;
+            --accent-color: #4ECDC4;
+            --light-gray: #F8F9FA;
+            --border-color: #E0E0E0;
+            --text-color: #333333;
+            --hover-color: #E8F4FE;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+        }
+        
+        /* Header */
+        .top-navbar {
+            height: 56px;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            background-color: white;
+            z-index: 100;
+        }
+        
+        .btn-new {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .btn-new:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: 500;
+            margin-right: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: text;
+        }
+        
+        .logo:focus {
+            background-color: var(--hover-color);
+            outline: none;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: #9C27B0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 500;
+        }
+        
+        .slide-navigation {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .btn-toolbar {
+            background: transparent;
+            border: none;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-toolbar:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .btn-upgrade {
+            background-color: #F8F9FA;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-export {
+            background-color: #F8F9FA;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        /* Main Content Layout */
+        .app-container {
+            display: flex;
+            height: calc(100vh - 56px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 190px;
+            overflow-y: auto;
+            background-color: #F8F9FA;
+            border-right: 1px solid var(--border-color);
+            padding: 10px;
+            height: 100%;
+        }
+        
+        .slide-thumbnail {
+            position: relative;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            background-color: white;
+            overflow: hidden;
+        }
+        
+        .slide-thumbnail.active {
+            border: 2px solid var(--primary-color);
+        }
+        
+        .slide-number {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+     
+        
+        .thumbnail-preview img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .edit-icon {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        /* Main Editor */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .slide-editor {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #F0F0F0;
+            overflow: auto;
+            padding: 20px;
+        }
+        
+        .slide-canvas {
+            width: 900px;
+            height: 540px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            left: -20px;
+        }    
+        
+        /* Right Panel */
+        .right-panel {
+            width: 300px;
+            background-color: white;
+            border-left: 1px solid var(--border-color);
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .panel-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .close-panel {
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .designs-container {
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .design-card {
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .design-card img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+        
+        .design-info {
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+        }
+        
+        .design-name {
+            font-weight: 500;
+        }
+        
+        .select-btn {
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .selected-mark {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        /* Timeline Design Styles */
+        .blue-accent {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background-color: var(--accent-color);
+            z-index: 0;
+        }
+        
+        .timeline-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-left: 60px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-left: 60px;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-periods {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 60px 0;
+        }
+        
+        .timeline-period {
+            width: 45%;
+        }
+        
+        .period-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .period-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .period-year {
+            font-size: 22px;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .timeline-curve {
+            position: relative;
+            margin: 30px 60px;
+            height: 60px;
+        }
+        
+        .curve-svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            position: absolute;
+            top: 40px;
+            transform: translateY(-50%);
+        }
+        
+        .dot-1 {
+            left: 0;
+        }
+        
+        .dot-2 {
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+        }
+        
+        .dot-3 {
+            right: 0;
+        }
+        
+        .bottom-timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 60px;
+        }
+        
+        /* Tools Panel */
+        .tools-panel {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 65px;
+            background-color: white;
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .tool-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .tool-button:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .tool-button.active {
+            color: var(--primary-color);
+        }
+        .tool-button i{font-size: 22px;}
+        
+        .tool-label {
+            font-size: 10px;
+            text-align: center;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+        
+        /* Editor element styles */
+        .editable {
+            outline: none;
+            text-align: center;
+        }
+        
+        .editable:focus {
+            box-shadow: 0 0 0 2px rgba(47, 128, 237, 0.3);
+        }
+
+
+        .slide-thumbnail {
+    width: 120px; /* Adjust width */
+    height: 80px; /* Adjust height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center vertically */
+    text-align: center; /* Center horizontally */
+    border: 1px solid #ccc;
+    margin: 5px;
+    padding: 10px;
+    background: #f9f9f9;
+    cursor: pointer;
+    position: relative;
+}
+
+.thumbnail-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 9px;
+    /* font-weight: bold; */
+    overflow: hidden;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.add-palette-btn{
+          margin-bottom: 25px;
+          border: navajowhite;
+          background: no-repeat;
+                         }
+        .theme-tabs {
+          display: flex;
+          border-bottom: 1px solid #ddd;
+          margin: 10px 20px;
+        }
+        
+        .theme-tabs .tab {
+          padding: 10px 20px;
+          cursor: pointer;
+          border-bottom: 3px solid transparent;
+        }
+        
+        .theme-tabs .tab.active {
+          border-bottom: 3px solid #5c85e1;
+          font-weight: bold;
+        }
+        
+        .tab-content {
+          display: none;
+          padding: 15px;
+        }
+        
+        .tab-content.active {
+          display: block;
+        }
+        
+        .palette {
+          display: flex;
+          gap: 5px;
+          margin-bottom: 10px;
+        }
+        
+        .palette div {
+          width: 70%;
+          height: 20px;
+          border-radius: 4px;
+        }
+         /* Font selector specific styles */
+         .font-search {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          }
+          
+          .font-preview-container {
+            margin-bottom: 15px;
+          }
+          
+          .preview-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+          }
+          
+          .font-preview {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            transition: opacity 0.2s;
+          }
+          
+          .preview-text {
+            font-size: 16px;
+            margin-bottom: 5px;
+          }
+          
+          .preview-chars {
+            font-size: 12px;
+          }
+          
+          .preview-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          
+          .apply-font-btn {
+            padding: 5px 12px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+          }
+          
+          .apply-font-btn:hover {
+            background-color: #3367d6;
+          }
+          
+          .recent-fonts-container {
+            margin-bottom: 15px;
+          }
+          
+          .recent-fonts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+          }
+          
+          .recent-font-item {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+          }
+          
+          .recent-font-item.selected {
+            background-color: #e8f0fe;
+            border-color: #a9c8fe;
+          }
+          
+          .fonts-list {
+            height: 250px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+          }
+          
+          .font-item {
+            padding: 8px 12px;
+            cursor: pointer;
+          }
+          
+          .font-item:hover {
+            background-color: #f5f5f5;
+          }
+          
+          .font-item.selected {
+            background-color: #e8f0fe;
+          }
+
+    </style>
+</head>
+<body>
+
+
+
+    <div id="toolbar">
+        <button onclick="applyStyle('bold')"><b>B</b></button>
+        <button onclick="applyStyle('italic')"><i>I</i></button>
+        <button onclick="applyStyle('underline')"><u>U</u></button>
+        
+        <select id="fontSizeSelect" onchange="changeFontSize()">
+            <option value="12">12px</option>
+            <option value="14">14px</option>
+            <option value="16" selected>16px</option>
+            <option value="18">18px</option>
+            <option value="20">20px</option>
+            <option value="24">24px</option>
+            <option value="30">30px</option>
+            <option value="36">36px</option>
+            <option value="42">42px</option>
+            <option value="48">48px</option>
+        </select>
+    
+        <button onclick="alignText('left')">🔽 Left</button>
+        <button onclick="alignText('center')">🔽 Center</button>
+        <button onclick="alignText('right')">🔽 Right</button>
+    
+        <!-- Background Color Picker -->
+        <input type="color" id="bgColorPicker" onchange="changeSlideBackground()" />
+
+
+
+        <input type="color" id="bgColorPickerppt" value="#ffffff">
+<button onclick="applyBackground()">Change Background</button>
+        
+        <button onclick="saveChanges()">💾 Save</button>
+    </div>
+    
+    <style>
+        #toolbar {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: #f4f4f4;
+            border-bottom: 2px solid #ddd;
+        }
+        button, select, input[type="color"] {
+            padding: 5px;
+            cursor: pointer;
+        }
+    </style>
+    
+    <!-- Top Navigation Bar -->
+
+
+    <div class="top-navbar">
+        <div class="d-flex align-items-center">
+            <a href="#" class="me-3 text-decoration-none text-dark">
+                <i class="fas fa-home"></i>
+            </a>
+            <button class="btn-new me-3">
+                <i class="fas fa-plus me-2"></i> New
+            </button>
+            <div class="logo" id="docTitle" contenteditable="true">History of India</div>
+            <div class="text-muted small" id="docOwner">Owned by Abhijeet Chandel</div>
+        </div>
+        
+        <div class="ms-auto d-flex align-items-center">
+            <div class="slide-navigation me-3">
+                <i class="fas fa-chevron-left me-3" id="prevSlide" role="button"></i>
+                <span id="slideCounter">Slide 1 / 2</span>
+                <i class="fas fa-chevron-right ms-3" id="nextSlide" role="button"></i>
+            </div>
+            <button class="btn-toolbar me-2" title="Save">
+                <i class="far fa-save"></i>
+            </button>
+            <div class="user-avatar me-2">A</div>
+            <button class="btn-toolbar me-2" title="Add collaborator">
+                <i class="fas fa-plus"></i>
+            </button>
+            <button class="btn-toolbar me-2" title="Help">
+                <i class="fas fa-question-circle"></i>
+            </button>
+            <button class="btn-upgrade me-2">
+                <i class="fas fa-crown me-1"></i> Upgrade to Pro
+            </button>
+            <button class="btn-export me-2">
+                <i class="fas fa-file-export me-1"></i> Export PPT
+            </button>
+            <button class="btn-toolbar" title="Present">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- Sidebar with Slides -->
+        <div class="sidebar">
+            <!-- <div class="slide-thumbnail active" data-slide="1">
+                <div class="slide-number">1</div>
+                <div class="thumbnail-preview">
+                    <div class="edit-icon">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                    <img src="/" alt="Slide 1 thumbnail">
+                </div>
+            </div> -->
+         
+        </div>
+
+        <!-- Editor Area -->
+        <div class="editor-area">
+            <div class="slide-editor">
+                <!-- <div class="slide-canvas">
+                     <div class="blue-accent"></div>
+                    
+                    <div class="timeline-title editable" contenteditable="true">A Comprehensive History of India</div>
+                    <div class="timeline-subtitle editable" contenteditable="true">Tracing India's Rich Historical Journey</div>
+                    
+                    <div class="timeline-periods">
+                        <div class="timeline-period">
+                            
+                            <div class="period-desc editable" contenteditable="true">One of the earliest urban cultures with advanced city planning.</div>
+                          
+                        </div>
+                       
+                    </div>
+                  
+                    
+                    
+                </div> -->
+            </div>
+            
+            <!-- Side Tools Panel -->
+            <div class="tools-panel">
+                <div class="tool-button active" id="designBtn">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <div class="tool-label">Design</div>
+                
+                <div class="tool-button" id="themeBtn">
+                    <i class="fas fa-brush"></i>
+                </div>
+                <div class="tool-label">Theme</div>
+                
+                <div class="tool-button" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="tool-label">Settings</div>
+                
+                <!-- <div class="tool-button" id="animationBtn">
+                    <i class="fas fa-film"></i>
+                </div>
+                <div class="tool-label">Animation</div> -->
+                
+                <div class="tool-button" id="elementsBtn">
+                    <i class="fas fa-th-large"></i>
+                </div>
+                <div class="tool-label">Elements</div>
+                
+                <div class="tool-button" id="notesBtn">
+                    <i class="fas fa-sticky-note"></i>
+                </div>
+                <div class="tool-label">Notes</div>
+                
+                <div class="tool-button" id="analyticsBtn">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="tool-label">Analytics</div>
+                
+                <!-- <div class="tool-button" id="hireBtn">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="tool-label">Hire</div> -->
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <div class="panel-header">
+              <h5 class="m-0">Theme</h5>
+              <div class="close-panel">&times;</div>
+            </div>
+          
+            <!-- Tabs: Colors | Font -->
+            <div class="theme-tabs">
+              <div class="tab active" id="colorsTab">Colors</div>
+              <div class="tab" id="fontsTab">Font</div>
+            </div>
+          
+            <!-- Tab Contents -->
+            <div class="theme-content">
+              <!-- Color Palette Section -->
+              <div class="tab-content active" id="colorsContent">
+                <!-- <button class="add-palette-btn">+ Add new color palette</button> -->
+          
+                <div class="palette-section">
+                  <h5>CURRENT</h5>
+                  <div class="palette current">
+                    <div style="background:#a6192e;" id="current"></div>
+                    <!-- <div style="background:#6e1410;"></div>
+                    <div style="background:#f9a11b;"></div>
+                    <div style="background:#008c8e;"></div> -->
+                  </div>
+          
+                  <!-- <h5>COMPANY</h5>
+                  <div class="palette">
+                    <div style="background:#4cc6ec;"></div>
+                  </div> -->
+          
+                  <h5>APP</h5>
+                  <div class="palette" onclick="setColor('#2196f3')">
+                    <div style="background:#2196f3;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#f44336')">
+                    <div style="background:#f44336;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#4caf50')">
+                    <div style="background:#4caf50;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#ffeb3b')">
+                    <div style="background:#ffeb3b;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#ff9800')">
+                    <div style="background:#ff9800;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#9c27b0')">
+                    <div style="background:#9c27b0;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#00bcd4')">
+                    <div style="background:#00bcd4;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#e91e63')">
+                    <div style="background:#e91e63;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#8bc34a')">
+                    <div style="background:#8bc34a;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#cddc39')">
+                    <div style="background:#cddc39;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#ff5722')">
+                    <div style="background:#ff5722;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#3f51b5')">
+                    <div style="background:#3f51b5;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#607d8b')">
+                    <div style="background:#607d8b;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#795548')">
+                    <div style="background:#795548;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#673ab7')">
+                    <div style="background:#673ab7;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#1e88e5')">
+                    <div style="background:#1e88e5;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#43a047')">
+                    <div style="background:#43a047;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#d32f2f')">
+                    <div style="background:#d32f2f;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#ff4081')">
+                    <div style="background:#ff4081;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#7b1fa2')">
+                    <div style="background:#7b1fa2;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#fbc02d')">
+                    <div style="background:#fbc02d;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#388e3c')">
+                    <div style="background:#388e3c;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#5d4037')">
+                    <div style="background:#5d4037;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#009688')">
+                    <div style="background:#009688;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#b71c1c')">
+                    <div style="background:#b71c1c;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#880e4f')">
+                    <div style="background:#880e4f;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#33691e')">
+                    <div style="background:#33691e;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#1a237e')">
+                    <div style="background:#1a237e;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#bdbdbd')">
+                    <div style="background:#bdbdbd;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#ffa000')">
+                    <div style="background:#ffa000;"></div>
+                </div>
+                <div class="palette" onclick="setColor('#3e2723')">
+                    <div style="background:#3e2723;"></div>
+                </div>
+                
+                </div>
+              </div>
+          
+              <!-- Font Section -->
+              <div class="tab-content" id="fontsContent">
+                <h5>Select Font</h5>
+                
+                <!-- Search input -->
+                <div class="search-container">
+                  <input type="text" id="fontSearch" placeholder="Search fonts..." class="font-search">
+                </div>
+                
+                <!-- Preview area -->
+                <div class="font-preview-container">
+                  <p class="preview-label">Preview:</p>
+                  <div id="fontPreview" class="font-preview">
+                    <p class="preview-text">The quick brown fox jumps over the lazy dog.</p>
+                    <p class="preview-chars">ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789</p>
+                  </div>
+                  <div class="preview-footer">
+                    <span id="currentFontName">Roboto</span>
+                    <button id="applyFontBtn" class="apply-font-btn">Apply Font</button>
+                  </div>
+                </div>
+                
+                <!-- Recent fonts section -->
+                <div id="recentFontsContainer" class="recent-fonts-container">
+                  <h6>Recent</h6>
+                  <div id="recentFonts" class="recent-fonts-grid"></div>
+                </div>
+                
+                <!-- All fonts list -->
+                <div class="all-fonts-container">
+                  <h6>All Fonts</h6>
+                  <div id="fontsList" class="fonts-list"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // This code enhances the existing presentation editor with templates
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables to track state
+    let currentSlide = 1;
+    const totalSlides = 2;
+    let activePanel = 'designPanel';
+    
+    // DOM Elements
+    const slideCounter = document.getElementById('slideCounter');
+    const prevSlideBtn = document.getElementById('prevSlide');
+    const nextSlideBtn = document.getElementById('nextSlide');
+    const slideThumbnails = document.querySelectorAll('.slide-thumbnail');
+    const closePanel = document.querySelector('.close-panel');
+    const toolButtons = document.querySelectorAll('.tool-button');
+    const editableElements = document.querySelectorAll('.editable');
+    const slideCanvas = document.querySelector('.slide-canvas');
+    
+
+
+    
+    // Template backgrounds and textures
+    const templates = {
+        'Inspiro': {
+            backgrounds: [
+                'url("https://images.unsplash.com/photo-1532210317995-cc56d90177d9?auto=format&fit=crop&q=80&w=1000")',
+                'linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)'
+            ],
+            textures: [
+                'none', 
+                'url("data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" fill="%23bbb" fill-opacity="0.1" fill-rule="evenodd"/%3E%3C/svg%3E")'
+            ],
+            accent: '#3498db',
+            fontColors: ['#ffffff', '#333333'],
+            slideStyles: [
+                { 
+                  titleSize: '2.5rem', 
+                  subtitleSize: '1.5rem',
+                  timelineColor: 'rgba(255,255,255,0.8)',
+                  overlayBackground: 'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.3))'
+                },
+                { 
+                  titleSize: '2.2rem', 
+                  subtitleSize: '1.3rem',
+                  timelineColor: '#333',
+                  overlayBackground: 'none'
+                }
+            ]
+        },
+        'Lumina': {
+            backgrounds: [
+                'url("https://images.unsplash.com/photo-1604537466158-719b1972feb8?auto=format&fit=crop&q=80&w=1000")',
+                'linear-gradient(to right, #ff758c 0%, #ff7eb3 100%)'
+            ],
+            textures: [
+                'none',
+                'url("data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%239C92AC" fill-opacity="0.1" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E")'
+            ],
+            accent: '#e74c3c',
+            fontColors: ['#ffffff', '#4a4a4a'],
+            slideStyles: [
+                { 
+                  titleSize: '2.6rem', 
+                  subtitleSize: '1.6rem',
+                  timelineColor: 'rgba(255,255,255,0.9)',
+                  overlayBackground: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.4))'
+                },
+                { 
+                  titleSize: '2.3rem', 
+                  subtitleSize: '1.4rem',
+                  timelineColor: '#555',
+                  overlayBackground: 'none'
+                }
+            ]
+        },
+        'Learnscape': {
+            backgrounds: [
+                'url("https://images.unsplash.com/photo-1516283182395-4b90237bff2e?auto=format&fit=crop&q=80&w=1000")',
+                'linear-gradient(to right, #8360c3, #2ebf91)'
+            ],
+            textures: [
+                'none',
+                'url("data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="88" height="24" viewBox="0 0 88 24"%3E%3Cg fill-rule="evenodd"%3E%3Cg id="autumn" fill="%239C92AC" fill-opacity="0.1"%3E%3Cpath d="M10 0l30 15 2 1V2.18A10 10 0 0 0 41.76 0H39.7a8 8 0 0 1 .3 2.18v10.58L14.47 0H10zm31.76 24a10 10 0 0 0-5.29-6.76L4 1 2 0v13.82a10 10 0 0 0 5.53 8.94L10 24h4.47l-6.05-3.02A8 8 0 0 1 4 13.82V3.24l31.58 15.78A8 8 0 0 1 39.7 24h2.06zM78 24l2.47-1.24A10 10 0 0 0 86 13.82V0h-4.18a10 10 0 0 0-9.53 6.76L64 12V0h-4v12l8.29 4.14A10 10 0 0 0 78 24zm0-2a8 8 0 0 1-7.42-5.34L68 15.65l8.58-4.3A8 8 0 0 1 81.82 2H84v11.82a8 8 0 0 1-4.47 7.18L78 22z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'
+            ],
+            accent: '#2ecc71',
+            fontColors: ['#ffffff', '#2c3e50'],
+            slideStyles: [
+                { 
+                  titleSize: '2.4rem', 
+                  subtitleSize: '1.4rem',
+                  timelineColor: 'rgba(255,255,255,0.85)',
+                  overlayBackground: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.4))'
+                },
+                { 
+                  titleSize: '2.1rem', 
+                  subtitleSize: '1.2rem',
+                  timelineColor: '#444',
+                  overlayBackground: 'none'
+                }
+            ]
+        }
+    };
+    
+    // Current selected template
+    let currentTemplate = 'Inspiro';
+    
+    // Function to apply template to current slide
+    function applyTemplate(templateName, slideNumber) {
+        const template = templates[templateName];
+        if (!template) return;
+        
+        // Get the slide canvas
+        const slideCanvas = document.querySelector('.slide-canvas');
+        const accentElement = document.querySelector('.blue-accent');
+       
+
+
+        
+        // Apply slide-specific styling
+        const slideIndex = slideNumber - 1;
+        const backgroundIndex = Math.min(slideIndex, template.backgrounds.length - 1);
+        const textureIndex = Math.min(slideIndex, template.textures.length - 1);
+        const fontColorIndex = Math.min(slideIndex, template.fontColors.length - 1);
+        const styleIndex = Math.min(slideIndex, template.slideStyles.length - 1);
+        
+        // Remove existing overlay if any
+        const existingOverlay = slideCanvas.querySelector('.slide-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+        
+        // Create overlay for image backgrounds on first slide
+        if (slideIndex === 0 && template.backgrounds[0].startsWith('url')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'slide-overlay';
+            overlay.style.position = 'absolute';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.background = template.slideStyles[styleIndex].overlayBackground;
+            overlay.style.zIndex = '1';
+            slideCanvas.appendChild(overlay);
+            
+            // Ensure content is above overlay
+            const contentElements = slideCanvas.querySelectorAll('.timeline-title, .timeline-subtitle, .timeline-periods, .timeline-curve, .bottom-timeline');
+            contentElements.forEach(el => {
+                el.style.position = 'relative';
+                el.style.zIndex = '2';
+            });
+        }
+        
+        // Apply styles
+        slideCanvas.style.background = template.backgrounds[backgroundIndex];
+        slideCanvas.style.backgroundSize = 'cover';
+        slideCanvas.style.backgroundPosition = 'center';
+        slideCanvas.style.color = template.fontColors[fontColorIndex];
+
+        
+
+
+        
+        // Apply texture as an additional layer if not 'none'
+        if (template.textures[textureIndex] !== 'none') {
+            slideCanvas.style.position = 'relative';
+            slideCanvas.style.isolation = 'isolate'; // Create stacking context
+            
+            // Remove existing texture if any
+            const existingTexture = slideCanvas.querySelector('.slide-texture');
+            if (existingTexture) {
+                existingTexture.remove();
+            }
+            
+            // Add texture element
+            const textureElement = document.createElement('div');
+            textureElement.className = 'slide-texture';
+            textureElement.style.position = 'absolute';
+            textureElement.style.top = '0';
+            textureElement.style.left = '0';
+            textureElement.style.width = '100%';
+            textureElement.style.height = '100%';
+            textureElement.style.backgroundImage = template.textures[textureIndex];
+            textureElement.style.zIndex = '1';
+            textureElement.style.pointerEvents = 'none'; // Allow interactions with elements below
+            slideCanvas.appendChild(textureElement);
+        }
+        
+        // Update accent color
+       // accentElement.style.backgroundColor = template.accent;
+        
+        // Update text styles
+        const titleElement = slideCanvas.querySelector('.timeline-title');
+        const subtitleElement = slideCanvas.querySelector('.timeline-subtitle');
+        
+        if (titleElement) {
+            titleElement.style.fontSize = template.slideStyles[styleIndex].titleSize;
+            titleElement.style.color = template.fontColors[fontColorIndex];
+        }
+        
+        if (subtitleElement) {
+            subtitleElement.style.fontSize = template.slideStyles[styleIndex].subtitleSize;
+            subtitleElement.style.color = template.fontColors[fontColorIndex];
+        }
+        
+        // Update timeline colors
+        const timelinePath = slideCanvas.querySelector('.curve-svg path');
+        const timelineDots = slideCanvas.querySelectorAll('.timeline-dot');
+        
+        if (timelinePath) {
+            timelinePath.setAttribute('stroke', template.slideStyles[styleIndex].timelineColor);
+        }
+        
+        timelineDots.forEach(dot => {
+            dot.style.backgroundColor = template.slideStyles[styleIndex].timelineColor;
+        });
+        
+        // Update period text colors
+        const periodElements = slideCanvas.querySelectorAll('.period-title, .period-desc, .period-year');
+        periodElements.forEach(el => {
+            el.style.color = template.fontColors[fontColorIndex];
+        });
+    }
+    
+    // Update slide counter
+    function updateSlideCounter() {
+        slideCounter.textContent = `Slide ${currentSlide} / ${totalSlides}`;
+    }
+    
+    // Navigate to previous slide
+    prevSlideBtn.addEventListener('click', function() {
+        if (currentSlide > 1) {
+            currentSlide--;
+            updateSlideCounter();
+            updateActiveThumbnail();
+            applyTemplate(currentTemplate, currentSlide);
+        }
+    });
+    
+    // Navigate to next slide
+    nextSlideBtn.addEventListener('click', function() {
+        if (currentSlide < totalSlides) {
+            currentSlide++;
+            updateSlideCounter();
+            updateActiveThumbnail();
+            applyTemplate(currentTemplate, currentSlide);
+        }
+    });
+    
+    // Update active thumbnail
+    function updateActiveThumbnail() {
+        slideThumbnails.forEach(thumbnail => {
+            const slideNumber = parseInt(thumbnail.dataset.slide);
+            if (slideNumber === currentSlide) {
+                thumbnail.classList.add('active');
+            } else {
+                thumbnail.classList.remove('active');
+            }
+        });
+    }
+    
+    // Click on thumbnail to navigate
+    slideThumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', function() {
+            currentSlide = parseInt(this.dataset.slide);
+            updateSlideCounter();
+            updateActiveThumbnail();
+            applyTemplate(currentTemplate, currentSlide);
+        });
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('abcdd');
+    document.querySelector('.right-panel').style.display = 'none';
+});
+    // Close panel
+    closePanel.addEventListener('click', function() {
+        document.querySelector('.right-panel').style.display = 'none';
+    });
+    
+    // Toggle tool panels
+    toolButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            toolButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Show the right panel
+            document.querySelector('.right-panel').style.display = 'flex';
+            
+            
+            // If theme button is clicked, update the panel content to show templates
+            if (this.id === 'designBtn') {
+                updateThemePanel();
+            }
+        });
+    });
+    
+    // Function to update the theme panel
+    async function updateThemePanel() {
+        try {
+        const response = await fetch("/templates");
+        const data = await response.json();
+
+        if (data.error) {
+            document.querySelector(".right-panel").innerHTML = `<p>${data.error}</p>`;
+            return;
+        }
+
+        const rightPanel = document.querySelector('.right-panel');
+        rightPanel.innerHTML = `
+            <div class="panel-header">
+                <h5 class="m-0">Choose a template</h5>
+                <div class="close-panel">&times;</div>
+            </div>
+            <div class="designs-container">
+                ${data.templates.map(template => `
+                    <div class="design-card" data-template="${template.id}">
+                        <div class="template-preview" style="background: ${template.backgrounds ? template.backgrounds[0] : '#ccc'}; background-size: cover;">
+                            <div style="background: rgba(0,0,0,0.3); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                <span style="color: white; font-weight: bold;">${template.name}</span>
+                            </div>
+                        </div>
+                        <div class="design-info">
+                            <div class="design-name">${template.name}</div>
+                            <div class="select-btn" onclick="createPresentation('${template.id}')">Select</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        // Close panel event listener
+        document.querySelector(".close-panel").addEventListener("click", function() {
+            rightPanel.style.display = "none";
+        });
+
+    } catch (error) {
+        console.error("Error loading templates:", error);
+        document.querySelector(".right-panel").innerHTML = `<p>Failed to load templates</p>`;
+    }
+
+        
+        // Re-attach close panel event
+        rightPanel.querySelector('.close-panel').addEventListener('click', function() {
+            rightPanel.style.display = 'none';
+        });
+        
+        // Attach template selection events
+        const selectButtons = rightPanel.querySelectorAll('.select-btn');
+        selectButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Find parent design card
+                const designCard = this.closest('.design-card');
+                const templateName = designCard.dataset.template;
+                
+                // Update current template
+                currentTemplate = templateName;
+                
+                // Remove all selected marks
+                document.querySelectorAll('.selected-mark').forEach(mark => {
+                    mark.remove();
+                });
+                
+                // Reset all select buttons
+                selectButtons.forEach(btn => {
+                    btn.textContent = 'Select';
+                });
+                
+                // Add selected mark to this design
+                const designInfo = designCard.querySelector('.design-info');
+                const selectedMark = document.createElement('div');
+                selectedMark.className = 'selected-mark';
+                selectedMark.innerHTML = '<i class="fas fa-check"></i>';
+                designInfo.appendChild(selectedMark);
+                
+                // Change this button text
+                this.remove();
+                
+                // Apply the template to current slide
+                applyTemplate(templateName, currentSlide);
+            });
+        });
+    }
+    
+    // Make elements editable
+    editableElements.forEach(element => {
+        element.addEventListener('focus', function() {
+            element.classList.add('editing');
+        });
+        
+        element.addEventListener('blur', function() {
+            element.classList.remove('editing');
+        });
+    });
+    
+    // Document title editable
+    const docTitle = document.getElementById('docTitle');
+    docTitle.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            this.blur();
+        }
+    });
+    
+    // Add CSS for new template features
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        .slide-canvas {
+            position: relative;
+            transition: background 0.3s ease;
+        }
+        
+        .template-preview {
+            width: 100%;
+            height: 150px;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        
+        .blue-accent {
+            transition: background-color 0.3s ease;
+        }
+        
+        .timeline-title, .timeline-subtitle, .period-title, .period-desc, .period-year {
+            transition: color 0.3s ease, font-size 0.3s ease;
+        }
+        
+        .slide-overlay, .slide-texture {
+            transition: all 0.3s ease;
+        }
+    `;
+    document.head.appendChild(styleElement);
+    
+    // Initialize
+    updateSlideCounter();
+    applyTemplate(currentTemplate, currentSlide);
+});
+
+async function loadSlides() {
+    try {
+        const slideEditor = document.querySelector(".slide-editor");
+        const slideThumbnailsContainer = document.querySelector(".sidebar");
+
+        if (!slideEditor || !slideThumbnailsContainer) {
+            console.error("❌ Required container elements not found.");
+            return;
+        }
+
+        const response = await fetch(`/slides?presentationId=12y2W_iTA51WfoBQ9Iy3mzj1IqyCyMHgq8qvA3BcQWrI`);
+        const data = await response.json();
+
+        console.log("🚀 API Response:", JSON.stringify(data, null, 2));
+
+        if (!data.slides || data.slides.length === 0) {
+            slideEditor.innerHTML = "<h2>No slides available</h2>";
+            return;
+        }
+
+        slideEditor.innerHTML = "";
+        slideThumbnailsContainer.innerHTML = "";
+
+        const SLIDE_WIDTH = 960;
+        const SLIDE_HEIGHT = 540;
+
+        data.slides.forEach((slide, index) => {
+            const slideCanvas = document.createElement("div");
+            slideCanvas.classList.add("slide-canvas");
+            slideCanvas.dataset.slide = slide.slideId;
+            slideCanvas.style.position = "relative";
+            slideCanvas.style.width = `${SLIDE_WIDTH}px`;
+            slideCanvas.style.height = `${SLIDE_HEIGHT}px`;
+            slideCanvas.style.padding = "10px";
+
+            // ✅ Apply Background Color from API
+            if (slide.backgroundColor) {
+                const { red, green, blue } = slide.backgroundColor;
+                slideCanvas.style.backgroundColor = `rgb(${Math.round(red * 255)}, ${Math.round(green * 255)}, ${Math.round(blue * 255)})`;
+
+
+            } else {
+                slideCanvas.style.backgroundColor = "#FFF"; // Default white
+            }
+
+            if (index !== 0) slideCanvas.style.display = "none";
+
+            let currentY = 50;
+
+            slide.elements.forEach((el, i) => {
+                if (el.type === "text") {
+                    const textDiv = document.createElement("div");
+                    textDiv.textContent = el.text.trim();
+                    textDiv.classList.add("editable");
+                    textDiv.setAttribute("contenteditable", "true");
+                    textDiv.dataset.elementId = el.id;
+                    textDiv.dataset.slideId = slide.slideId;
+
+                    if (i != 0) {
+                        textDiv.style.position = "absolute";
+                        textDiv.style.left = "50px";
+                    }
+                    textDiv.style.whiteSpace = "pre-wrap";
+                    textDiv.style.fontSize = "20px";
+                    textDiv.style.padding = "70px";
+                    textDiv.style.border = "1px solid transparent";
+                    textDiv.style.height = "40px";
+                    textDiv.style.top = `${currentY}px`;
+                    textDiv.style.zIndex = "10";
+
+                    if (el.textColor) {
+                        const { red, green, blue } = el.textColor;
+                        textDiv.style.color = `rgb(${Math.round(red * 255)}, ${Math.round(green * 255)}, ${Math.round(blue * 255)})`;
+                    } else {
+                        textDiv.style.color = "#000";
+                    }
+
+                    currentY += 50;
+
+                    textDiv.addEventListener("focus", () => {
+                        textDiv.style.border = "1px solid #007BFF";
+                    });
+
+                    textDiv.addEventListener("blur", async () => {
+                        textDiv.style.border = "1px solid transparent";
+                        const newText = textDiv.textContent.trim();
+                        const elementId = textDiv.dataset.elementId;
+                        const slideId = textDiv.dataset.slideId;
+
+                        if (newText !== el.text.trim()) {
+                            console.log(`🔄 Updating text for ${elementId} in ${slideId}: ${newText}`);
+                            el.text = newText;
+                            await updateSlideText(slideId, elementId, newText);
+                        }
+                    });
+
+                    slideCanvas.appendChild(textDiv);
+                }
+            });
+
+            slideEditor.appendChild(slideCanvas);
+
+            const thumbnailDiv = document.createElement("div");
+            thumbnailDiv.classList.add("slide-thumbnail");
+            if (index === 0) thumbnailDiv.classList.add("active");
+            thumbnailDiv.dataset.slide = slide.slideId;
+
+            const previewText = slide.elements[0]?.text.substring(0, 25) || `Slide ${index + 1}`;
+            thumbnailDiv.innerHTML = `
+                <div class="slide-number">${index + 1}</div>
+                <div class="thumbnail-preview">${previewText}</div>
+            `;
+
+            if (slide.backgroundColor) {
+                const { red, green, blue } = slide.backgroundColor;
+                thumbnailDiv.style.backgroundColor = `rgb(${Math.round(red * 255)}, ${Math.round(green * 255)}, ${Math.round(blue * 255)})`;
+
+
+            }
+            
+
+            thumbnailDiv.addEventListener("click", () => {
+                document.querySelectorAll(".slide-canvas").forEach(s => s.style.display = "none");
+                document.querySelectorAll(".slide-thumbnail").forEach(t => t.classList.remove("active"));
+
+                slideCanvas.style.display = "block";
+                thumbnailDiv.classList.add("active");
+            });
+
+            slideThumbnailsContainer.appendChild(thumbnailDiv);
+        });
+
+    } catch (error) {
+        console.error("❌ Error loading slides:", error);
+    }
+}
+
+async function updateSlideText(slideId, elementId, newText) {
+    try {
+        console.log(`📡 Sending update: slideId=${slideId}, elementId=${elementId}, newText=${newText}`);
+
+        const response = await fetch(`/api/update-slide`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                presentationId: "12y2W_iTA51WfoBQ9Iy3mzj1IqyCyMHgq8qvA3BcQWrI", // Your Google Slide ID
+                slideObjectId: elementId,
+                newText,
+            }),
+        });
+
+        const result = await response.json();
+        console.log("✅ Text updated:", result);
+    } catch (error) {
+        console.error("❌ Error updating text:", error);
+    }
+}
+
+
+document.addEventListener("DOMContentLoaded", loadSlides);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let selectedTextElement = null;
+
+// Track selected text
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("editable")) {
+        selectedTextElement = e.target;
+    }
+});
+
+// Apply Bold, Italic, Underline
+function applyStyle(style) {
+    if (selectedTextElement) {
+        document.execCommand(style, false, null);
+    }
+}
+
+// Change Font Size
+function changeFontSize() {
+    if (selectedTextElement) {
+        const fontSize = document.getElementById("fontSizeSelect").value;
+        selectedTextElement.style.fontSize = fontSize + "px";
+    }
+}
+
+// Align Text
+function alignText(alignType) {
+    if (selectedTextElement) {
+        selectedTextElement.style.textAlign = alignType;
+    }
+}
+
+
+async function saveChanges() {
+    const updatedElements = [];
+
+    document.querySelectorAll(".editable").forEach(textDiv => {
+        updatedElements.push({
+            elementId: textDiv.dataset.elementId,
+            text: textDiv.innerHTML.trim(),
+            fontSize: parseInt(window.getComputedStyle(textDiv).fontSize),
+            alignment: window.getComputedStyle(textDiv).textAlign,
+            isBold: window.getComputedStyle(textDiv).fontWeight >= 600,
+            isItalic: window.getComputedStyle(textDiv).fontStyle === "italic",
+            isUnderline: window.getComputedStyle(textDiv).textDecoration.includes("underline")
+        });
+    });
+
+   // const bgColor = document.getElementById("bgColorPicker").value;
+  //  const rgbColor = hexToRgbObject(bgColor);
+    const activeSlide = document.querySelector(".slide-canvas:not([style*='display: none'])");
+
+
+   // activeSlide.style.backgroundColor = colorPicker.value;
+   // updateSlideBackground(activeSlide.dataset.slide, colorPicker.value);
+
+
+    try {
+        const response = await fetch("/api/update-slide2", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                presentationId: '12y2W_iTA51WfoBQ9Iy3mzj1IqyCyMHgq8qvA3BcQWrI', // Replace with actual ID
+                slideId: activeSlide.dataset.slide, // Replace with actual Slide ID
+                updates: updatedElements
+               // backgroundColor: rgbColor
+            })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert("✅ Changes saved successfully!");
+        } else {
+            alert("❌ Error saving changes!");
+        }
+    } catch (error) {
+        console.error("Error updating slides:", error);
+        alert("❌ Failed to update slides.");
+    }
+}
+
+
+
+
+function changeSlideBackground() {
+    const colorPicker = document.getElementById("bgColorPicker");
+    const activeSlide = document.querySelector(".slide-canvas:not([style*='display: none'])");
+
+    if (activeSlide) {
+        activeSlide.style.backgroundColor = colorPicker.value;
+        updateSlideBackground(activeSlide.dataset.slide, colorPicker.value);
+    }
+}
+
+function setColor(color) {
+        document.getElementById("bgColorPickerppt").value = color;
+        applyBackground();
+    }
+
+function applyBackground() {
+    const color = document.getElementById("bgColorPickerppt").value;
+    updatePPTBackground(null, color); // Passing null to update all slides
+
+
+    const slideCanvases = document.querySelectorAll('.slide-canvas');
+
+slideCanvases.forEach(slide => {
+    slide.style.background = color;
+});
+
+
+const slideThumb = document.querySelectorAll('.slide-thumbnail');
+
+slideThumb.forEach(slide => {
+    slide.style.background = color;
+});
+
+const current = document.getElementById('current');
+
+
+current.style.background = color;
+
+}
+
+async function updateSlideBackground(slideId, color) {
+    try {
+        const presentationId = "12y2W_iTA51WfoBQ9Iy3mzj1IqyCyMHgq8qvA3BcQWrI"; // Replace with your actual presentation ID
+
+        const response = await fetch("/api/update-slide-background", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slideId, color, presentationId })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            console.log(`🎨 Background updated for slide ${slideId}`);
+        } else {
+            console.error("❌ Failed to update background:", result.error);
+        }
+    } catch (error) {
+        console.error("❌ Error updating background:", error);
+    }
+}
+
+
+async function updatePPTBackground(slideId = null, color) {
+    try {
+        const presentationId = "12y2W_iTA51WfoBQ9Iy3mzj1IqyCyMHgq8qvA3BcQWrI"; // Replace with actual ID
+
+        const response = await fetch("/api/update-slide-background", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slideId, color, presentationId })  // If slideId is null, all slides are updated
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            console.log(`🎨 Background updated for ${slideId ? `slide ${slideId}` : "ALL slides"}`);
+        } else {
+            console.error("❌ Failed to update background:", result.error);
+        }
+    } catch (error) {
+        console.error("❌ Error updating background:", error);
+    }
+}
+
+
+
+function hexToRgbObject(hex) {
+    const bigint = parseInt(hex.slice(1), 16);
+    return {
+        red: ((bigint >> 16) & 255) / 255,
+        green: ((bigint >> 8) & 255) / 255,
+        blue: (bigint & 255) / 255
+    };
+}
+
+    </script>
+</body>
+</html>

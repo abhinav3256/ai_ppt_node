@@ -1,0 +1,89 @@
+/* General styles */
+body {
+    font-family: "Poppins", sans-serif;
+    text-align: center;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Title */
+h1 {
+    font-size: 24px;
+    margin: 20px;
+    color: #333;
+}
+
+/* Button styles */
+button {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s ease;
+    margin-top: 20px;
+}
+
+button:hover {
+    background: #007bff;
+    color: #fff;
+}
+
+/* Slide container */
+#slidesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Individual Slide */
+.slide {
+    width: 600px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    transition: 0.3s ease;
+}
+
+.slide:hover {
+    transform: scale(1.02);
+}
+
+/* Editable Text */
+[contenteditable="true"] {
+    font-size: 18px;
+    color: #333;
+    padding: 8px;
+    border-radius: 5px;
+    outline: none;
+    cursor: text;
+    border: 1px solid transparent;
+    transition: 0.3s;
+}
+
+[contenteditable="true"]:focus {
+    border: 1px solid #007bff;
+    background: #e9f5ff;
+}
+
+/* Slide Image */
+.slide img {
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Save Button */
+#saveButton {
+    background: #28a745;
+    color: white;
+}
+
+#saveButton:hover {
+    background: #218838;
+}

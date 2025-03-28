@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Slides Viewer</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #templates-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .template { cursor: pointer; padding: 10px; border: 1px solid #ddd; width: 200px; }
+        .template img { width: 100%; }
+    </style>
+</head>
+<body>
+
+<h1>Google Slides Viewer</h1>
+
+<h2>Select a Template</h2>
+<div id="templates-container"></div>
+
+<script>
+async function fetchTemplates() {
+    const response = await fetch("/templates");
+    const data = await response.json();
+    
+    if (data.error) {
+        document.getElementById("templates-container").innerHTML = `<p>${data.error}</p>`;
+        return;
+    }
+
+    const container = document.getElementById("templates-container");
+    container.innerHTML = "";
+    
+    data.templates.forEach(template => {
+        const div = document.createElement("div");
+        div.classList.add("template");
+        div.innerHTML = `<p>${template.name}</p>`;
+        div.onclick = () => createPresentation(template.id);
+        container.appendChild(div);
+    });
+}
+
+async function createPresentation(templateId) {
+    const response = await fetch("/create-presentation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ templateId })
+    });
+    
+    const data = await response.json();
+    if (data.newPresentationId) {
+        alert(`New presentation created! ID: ${data.newPresentationId}`);
+        if (data.redirectUrl) {
+        document.location = data.redirectUrl; // Works in both browser and server-side rendered pages
+    } 
+    } else {
+        alert("Error creating presentation.");
+    }
+}
+
+fetchTemplates();
+</script>
+
+</body>
+</html>

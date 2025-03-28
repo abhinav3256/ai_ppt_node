@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Slides Editor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Google Slides Editor</h1>
+    
+    <!-- Embedded Google Slides -->
+    <iframe id="slidesIframe" width="900" height="500" frameborder="0"></iframe>
+
+    <!-- Slide Preview -->
+    <div id="slidesContainer"></div>
+
+    <!-- Hidden File Input -->
+    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+
+    <!-- Floating Save Button -->
+    <button id="saveButton" onclick="saveChanges()">💾 Save Changes</button>
+
+    <script src="script.js"></script>
+</body>
+</html>
